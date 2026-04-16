@@ -1,0 +1,29 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function verified() {
+      return signedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isMosqueUser(mosqueId) {
+      return verified() &&
+        firestore.exists(/databases/(default)/documents/mosques/$(mosqueId)/users/$(request.auth.uid));
+    }
+
+    function isAdminLike(mosqueId) {
+      return isMosqueUser(mosqueId) &&
+        firestore.get(/databases/(default)/documents/mosques/$(mosqueId)/users/$(request.auth.uid)).data.role
+          in ['owner', 'admin', 'cashier'];
+    }
+
+    match /mosques/{mosqueId}/{allPaths=**} {
+      allow read: if isMosqueUser(mosqueId);
+      allow write: if isAdminLike(mosqueId) && request.resource.size < 20 * 1024 * 1024;
+    }
+  }
+}

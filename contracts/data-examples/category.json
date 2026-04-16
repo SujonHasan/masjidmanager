@@ -1,0 +1,10 @@
+{
+  "type": "income",
+  "name": "Zakat",
+  "slug": "zakat",
+  "color": "#0f8f6f",
+  "icon": "hand-heart",
+  "isDefault": true,
+  "isActive": true,
+  "sortOrder": 10
+}

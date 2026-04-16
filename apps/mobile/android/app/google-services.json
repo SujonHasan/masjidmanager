@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "175526559776",
+    "project_id": "masjidmanager-saas-sujon",
+    "storage_bucket": "masjidmanager-saas-sujon.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:175526559776:android:76ad7c06d71ce0ded27c45",
+        "android_client_info": {
+          "package_name": "com.masjidmanager.masjid_manager_mobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDqev3yYtq3bo9iD1AHMpTHmoRlGZBO8to"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

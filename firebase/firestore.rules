@@ -1,0 +1,129 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isSuperAdmin() {
+      return signedIn() && request.auth.token.super_admin == true;
+    }
+
+    function verified() {
+      return signedIn() && request.auth.token.email_verified == true;
+    }
+
+    function membership(mosqueId) {
+      return get(/databases/$(database)/documents/mosques/$(mosqueId)/users/$(request.auth.uid));
+    }
+
+    function isMosqueUser(mosqueId) {
+      return signedIn() && exists(/databases/$(database)/documents/mosques/$(mosqueId)/users/$(request.auth.uid));
+    }
+
+    function isActiveMosqueUser(mosqueId) {
+      return isMosqueUser(mosqueId) && membership(mosqueId).data.active == true;
+    }
+
+    function isVerifiedActiveMosqueUser(mosqueId) {
+      return verified() && isActiveMosqueUser(mosqueId);
+    }
+
+    function role(mosqueId) {
+      return membership(mosqueId).data.role;
+    }
+
+    function isAdminLike(mosqueId) {
+      return isVerifiedActiveMosqueUser(mosqueId) &&
+        role(mosqueId) in ['owner', 'admin', 'cashier'];
+    }
+
+    function isOwnerOrAdmin(mosqueId) {
+      return isVerifiedActiveMosqueUser(mosqueId) &&
+        role(mosqueId) in ['owner', 'admin'];
+    }
+
+    match /users/{uid} {
+      allow create: if signedIn() && request.auth.uid == uid;
+      allow read, update: if signedIn() && request.auth.uid == uid;
+      allow delete: if isSuperAdmin();
+    }
+
+    match /mosques/{mosqueId} {
+      allow create: if signedIn() && request.resource.data.ownerId == request.auth.uid;
+      allow read: if isVerifiedActiveMosqueUser(mosqueId) ||
+        (signedIn() && resource.data.ownerId == request.auth.uid) ||
+        isSuperAdmin();
+      allow update: if isOwnerOrAdmin(mosqueId) || isSuperAdmin();
+      allow delete: if isSuperAdmin();
+
+      match /users/{uid} {
+        allow create: if signedIn() && (
+          request.auth.uid == uid ||
+          isOwnerOrAdmin(mosqueId) ||
+          isSuperAdmin()
+        );
+        allow read: if request.auth.uid == uid || isVerifiedActiveMosqueUser(mosqueId) || isSuperAdmin();
+        allow update: if isOwnerOrAdmin(mosqueId) || isSuperAdmin();
+        allow delete: if isOwnerOrAdmin(mosqueId) || isSuperAdmin();
+      }
+
+      match /categories/{categoryId} {
+        allow read: if isVerifiedActiveMosqueUser(mosqueId) || isSuperAdmin();
+        allow create, update: if isOwnerOrAdmin(mosqueId) || isSuperAdmin();
+        allow delete: if isOwnerOrAdmin(mosqueId) || isSuperAdmin();
+      }
+
+      match /transactions/{transactionId} {
+        allow read: if isVerifiedActiveMosqueUser(mosqueId) || isSuperAdmin();
+        allow create, update: if isAdminLike(mosqueId) || isSuperAdmin();
+        allow delete: if isOwnerOrAdmin(mosqueId) || isSuperAdmin();
+      }
+
+      match /members/{memberId} {
+        allow read: if isVerifiedActiveMosqueUser(mosqueId) || isSuperAdmin();
+        allow create, update, delete: if isOwnerOrAdmin(mosqueId) || isSuperAdmin();
+      }
+
+      match /documents/{documentId} {
+        allow read: if isVerifiedActiveMosqueUser(mosqueId) || isSuperAdmin();
+        allow create, update, delete: if isOwnerOrAdmin(mosqueId) || isSuperAdmin();
+      }
+
+      match /announcements/{announcementId} {
+        allow read: if isVerifiedActiveMosqueUser(mosqueId) || isSuperAdmin();
+        allow create, update, delete: if isOwnerOrAdmin(mosqueId) || isSuperAdmin();
+      }
+
+      match /prayerTimes/{scheduleId} {
+        allow read: if isVerifiedActiveMosqueUser(mosqueId) || isSuperAdmin();
+        allow create, update, delete: if isOwnerOrAdmin(mosqueId) || isSuperAdmin();
+      }
+
+      match /summaries/{summaryId} {
+        allow read: if isVerifiedActiveMosqueUser(mosqueId) || isSuperAdmin();
+        allow write: if false;
+      }
+
+      match /auditLogs/{logId} {
+        allow read: if isOwnerOrAdmin(mosqueId) || isSuperAdmin();
+        allow write: if false;
+      }
+
+      match /deletedItems/{deletedItemId} {
+        allow read: if isOwnerOrAdmin(mosqueId) || isSuperAdmin();
+        allow create, update, delete: if isOwnerOrAdmin(mosqueId) || isSuperAdmin();
+      }
+    }
+
+    match /plans/{planId} {
+      allow read: if true;
+      allow write: if isSuperAdmin();
+    }
+
+    match /subscriptions/{subscriptionId} {
+      allow read, write: if isSuperAdmin();
+    }
+  }
+}

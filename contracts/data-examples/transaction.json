@@ -1,0 +1,10 @@
+{
+  "type": "income",
+  "categoryId": "cat_zakat",
+  "categoryNameSnapshot": "Zakat",
+  "amount": 2500,
+  "date": "2026-04-15",
+  "paymentMethod": "Cash",
+  "notes": "Friday collection",
+  "createdBy": "uid_123"
+}

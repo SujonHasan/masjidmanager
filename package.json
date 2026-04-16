@@ -1,0 +1,19 @@
+{
+  "name": "masjidmanager",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/web",
+    "firebase/functions"
+  ],
+  "scripts": {
+    "web:dev": "npm --workspace apps/web run dev",
+    "web:build": "npm --workspace apps/web run build",
+    "web:lint": "npm --workspace apps/web run lint",
+    "functions:build": "npm --workspace firebase/functions run build",
+    "functions:lint": "npm --workspace firebase/functions run lint"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
