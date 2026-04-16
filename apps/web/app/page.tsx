@@ -1,5 +1,10 @@
 import { MarketingHome } from "@/components/MarketingHome";
+import { AuthRedirect } from "@/components/AuthRedirect";
 
 export default function Home() {
-  return <MarketingHome />;
+  return (
+    <AuthRedirect>
+      <MarketingHome />
+    </AuthRedirect>
+  );
 }

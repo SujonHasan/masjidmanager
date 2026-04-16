@@ -67,7 +67,7 @@ export function DashboardApp() {
     <main className="dashboard-grid bg-[var(--background)]">
       <aside className="border-r border-[var(--line)] bg-white p-4 max-[900px]:border-b max-[900px]:border-r-0">
         <div className="mb-6">
-          <Link href="/" className="text-xl font-black">
+          <Link href="/dashboard" className="text-xl font-black">
             Masjid<span className="text-[var(--brand)]">Manager</span>
           </Link>
           <p className="mt-2 text-sm font-semibold text-[var(--muted)]">

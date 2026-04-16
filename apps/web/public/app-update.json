@@ -1,0 +1,14 @@
+{
+  "enabled": true,
+  "latestVersionName": "1.0.1",
+  "latestBuildNumber": 2,
+  "minimumBuildNumber": 1,
+  "apkUrl": "",
+  "title": "A fresh Masjid Manager update is ready",
+  "body": "Install the latest version for smoother mosque records, cleaner dashboard navigation, and better Firebase sync.",
+  "releaseNotes": [
+    "New mobile dashboard menu with income, expenses, categories, members, announcements, prayer times, reports, and settings.",
+    "Cleaner login, registration, and email verification flow.",
+    "Realtime Firestore sync improvements for admin records."
+  ]
+}

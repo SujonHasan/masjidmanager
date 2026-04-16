@@ -31,12 +31,44 @@ class _LoginScreenState extends State<LoginScreen> {
   bool get _showVerification => _firebaseReady && _verificationPending;
 
   @override
+  void initState() {
+    super.initState();
+    _redirectVerifiedUser();
+  }
+
+  @override
   void dispose() {
     _mosqueNameController.dispose();
     _addressController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  Future<void> _redirectVerifiedUser() async {
+    if (!_firebaseReady) return;
+
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    try {
+      await user.reload();
+      final refreshedUser = FirebaseAuth.instance.currentUser;
+      if (!mounted || refreshedUser == null) return;
+
+      if (refreshedUser.emailVerified) {
+        await refreshedUser.getIdToken(true);
+        if (mounted) context.go('/dashboard');
+      } else {
+        setState(() {
+          _pendingEmail = refreshedUser.email;
+          _verificationPending = true;
+          _notice = 'Please verify your email before entering the dashboard.';
+        });
+      }
+    } catch (_) {
+      await FirebaseAuth.instance.signOut();
+    }
   }
 
   Future<void> _submit() async {
